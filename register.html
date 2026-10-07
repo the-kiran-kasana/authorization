@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head><title>Register</title></head>
+<body>
+<h2>Register</h2>
+<input id="nameId" placeholder="Name"><br>
+<input id="emailId" placeholder="Email"><br>
+<input id="passwordId" type="password" placeholder="Password"><br>
+<button onclick="registerBtn()">Register</button>
+<p id="message"></p>
+
+<script type="module">
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+import { ref, set } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+import { auth, db } from "./firebase-config.js"; // This must export correct instances
+
+window.registerBtn = function () {
+  const name = document.getElementById("nameId").value;
+  const email = document.getElementById("emailId").value;
+  const password = document.getElementById("passwordId").value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+
+      // ✅ Save user to database with role
+      set(ref(db, "users/" + user.uid), {
+        name: name,
+        email: email,
+        role: "admin"
+      }).then(() => {
+        console.log("✅ User role saved.");
+        window.location.href = "dashboard.html";
+      }).catch((error) => {
+        console.error("❌ Error saving user:", error.message);
+      });
+    })
+    .catch((error) => {
+      console.error("❌ Registration error:", error.message);
+    });
+};
+
+  </script>
+</body>
+</html>

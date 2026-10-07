@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>Login</title></head>
+<body>
+<h2>Login</h2>
+<input id="emailId" placeholder="Email"><br>
+<input id="passwordId" type="password" placeholder="Password"><br>
+<button onclick="loginBtn()">Login</button>
+<p id="message"></p>
+
+<script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    window.loginBtn = function () {
+      const email = document.getElementById("emailId").value;
+      const password = document.getElementById("passwordId").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("message").innerText = "Login successful!";
+          window.location.href = "dashboard.html";
+        })
+        .catch(error => {
+          document.getElementById("message").innerText = error.message;
+        });
+    };
+  </script>
+</body>
+</html>

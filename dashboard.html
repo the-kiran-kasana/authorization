@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+<h1>Dashboard</h1>
+<p id="roleDisplay"></p>
+<button onclick="logout()">Logout</button>
+
+<script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { ref, get, child } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+    const dbRef = ref(db);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Fetch role from database
+      get(child(dbRef, `users/${user.uid}`)).then(snapshot => {
+        if (snapshot.exists()) {
+          const role = snapshot.val().role;
+          document.getElementById("roleDisplay").innerText = "Logged in as: " + role;
+
+          // ✅ Authorization check
+          if (role !== "admin") {
+            alert("Access denied. Admins only.");
+            window.location.href = "login.html";
+          }
+        } else {
+          alert("No user role found.");
+          window.location.href = "login.html";
+        }
+      });
+    });
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    };
+  </script>
+</body>
+</html>
